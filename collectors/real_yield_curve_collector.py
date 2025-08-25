@@ -1,4 +1,4 @@
-# collectors/yield_curve_collector.py
+# collectors/real_yield_curve_collector.py
 import os
 import sys
 from datetime import datetime
@@ -10,35 +10,35 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 from dao import IndicatorDAO
-from collectors.treasury_parser import get_treasury_history # <-- ИМПОРТИРУЕМ ГЛАВНУЮ ФУНКЦИЮ
+from collectors.treasury_parser import get_treasury_history # <-- ИМПОРТИРУЕМ ТУ ЖЕ ФУНКЦИЮ
 
 # --- КОНФИГУРАЦИЯ ---
 INDICATOR_CONFIG = {
-    'name': 'us_treasury_yield_curve',
-    'full_name': 'Daily Treasury Par Yield Curve Rates',
+    'name': 'us_treasury_real_yield_curve',
+    'full_name': 'Daily Treasury Par Real Yield Curve Rates',
     'source': 'U.S. Department of the Treasury',
-    'description': 'Nominal yield curve rates for various maturities, Fridays only.'
+    'description': 'Real yield curve rates (TIPS) for various maturities, Fridays only.'
 }
-RATE_TYPE = 'daily_treasury_yield_curve'
-DEFAULT_START_DATE = datetime(2000, 1, 1).date()
+RATE_TYPE = 'daily_treasury_real_yield_curve'
+DEFAULT_START_DATE = datetime(2004, 1, 1).date()
 
 def main():
     dao = None
     try:
-        print("--- Запуск сборщика НОМИНАЛЬНОЙ кривой доходности ---")
+        print("--- Запуск сборщика РЕАЛЬНОЙ кривой доходности ---")
         dao = IndicatorDAO()
         indicator_id = dao.add_indicator(**INDICATOR_CONFIG)
 
         if not indicator_id:
             print("Не удалось получить ID индикатора.")
             return
-
+            
         latest_date_str = dao.get_latest_indicator_date(indicator_id)
         start_date = pd.to_datetime(latest_date_str).date() if latest_date_str else DEFAULT_START_DATE
         
         # ОДИН ВЫЗОВ для получения всей истории
         history_df = get_treasury_history(RATE_TYPE, start_date)
-        
+
         if history_df.empty:
             print("Нет новых данных для сохранения.")
             return
@@ -55,7 +55,7 @@ def main():
         print("\nСбор данных завершен.")
 
     except Exception as e:
-        print(f"Произошла ошибка в коллекторе номинальных ставок: {e}")
+        print(f"Произошла ошибка в коллекторе реальных ставок: {e}")
     finally:
         if dao:
             dao.close()
