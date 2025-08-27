@@ -4,7 +4,7 @@ from fredapi import Fred
 from datetime import datetime
 
 # --- КОНФИГУРАЦИЯ ---
-FRED_API_KEY = '789b6994e97bd3107e584fda90796e5f'
+FRED_API_KEY = ''
 
 def get_fred_series_history(series_id: str, start_date: str = None) -> pd.DataFrame:
     """
