@@ -2,9 +2,15 @@
 import pandas as pd
 from fredapi import Fred
 from datetime import datetime
+import os
+from dotenv import load_dotenv
 
-# --- КОНФИГУРАЦИЯ ---
-FRED_API_KEY = ''
+# --- ЗАГРУЗКА ПЕРЕМЕННЫХ ОКРУЖЕНИЯ ---
+load_dotenv()
+FRED_API_KEY = os.getenv('FRED_API_KEY')
+
+if not FRED_API_KEY:
+    raise ValueError("FRED_API_KEY не найден в .env файле")
 
 def get_fred_series_history(series_id: str, start_date: str = None) -> pd.DataFrame:
     """

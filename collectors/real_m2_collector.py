@@ -2,6 +2,10 @@
 import os
 import sys
 import pandas as pd
+from dotenv import load_dotenv
+
+# --- ЗАГРУЗКА ПЕРЕМЕННЫХ ОКРУЖЕНИЯ ---
+load_dotenv()
 
 # --- ДОБАВЛЕНИЕ КОРНЕВОЙ ПАПКИ В ПУТЬ ПОИСКА МОДУЛЕЙ ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
