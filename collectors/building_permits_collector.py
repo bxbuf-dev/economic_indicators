@@ -11,7 +11,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from dao import IndicatorDAO
+from dao_No_Debug import IndicatorDAO
 from collectors.fred_parser import get_fred_series_history
 
 # --- КОНФИГУРАЦИЯ ---

@@ -77,14 +77,8 @@ class IndicatorDAO:
         created_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         release_data_json = json.dumps(release_data, indent=4)
         sql = "INSERT INTO indicator_releases (indicator_id, date, category, release_data, source_url, created_at) VALUES (?, ?, ?, ?, ?, ?)"
-        try:
-            self.cursor.execute(sql, (indicator_id, date, category, release_data_json, source_url, created_time))
-            self.conn.commit()
-            print(f"✓ Successfully inserted release: indicator_id={indicator_id}, date={date}, category={category}")
-        except sqlite3.Error as e:
-            print(f"✗ Error inserting release: {e}")
-            print(f"  Parameters: indicator_id={indicator_id}, date={date}, category={category}")
-            raise
+        self.cursor.execute(sql, (indicator_id, date, category, release_data_json, source_url, created_time))
+        self.conn.commit()
 
     def add_comment(self, indicator_id, date, comment_text):
         created_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

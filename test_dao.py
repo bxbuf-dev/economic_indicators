@@ -1,7 +1,7 @@
 # test_dao.py
 # Комплексный тест для проверки всех основных методов IndicatorDAO.
 
-from dao import IndicatorDAO
+from dao_No_Debug import IndicatorDAO
 
 def run_dao_test():
     """
