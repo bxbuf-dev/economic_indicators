@@ -41,7 +41,6 @@ def collect_umcsi():
         print(f"Processing UMCSI data for {date}")
         
         # Determine if this is preliminary or final data
-        # For now, we'll assume it's final unless we can detect "preliminary" in the text
         is_preliminary = any('preliminary' in text.lower() for text in text_releases.values())
         suffix = '_p' if is_preliminary else ''
         
@@ -60,7 +59,7 @@ def collect_umcsi():
             print(f"Added {category_name}: {value}")
             records_added += 1
         
-        # Add text releases to database
+        # Add text releases to database with duplicate checking
         print(f"\nProcessing text releases:")
         print(f"Expectations text length: {len(text_releases.get('expectations', ''))}")
         print(f"Inflation text length: {len(text_releases.get('inflation', ''))}")
@@ -80,15 +79,20 @@ def collect_umcsi():
                 print(f"Adding {text_type} release to database...")
                 
                 try:
-                    dao.add_indicator_release(
+                    success = dao.add_indicator_release(
                         indicator_id=indicator_id,
                         date=date,
                         release_data=release_data,
                         source_url="https://www.sca.isr.umich.edu/",
                         category=text_type
                     )
-                    print(f"✓ Added {text_type} text release")
-                    releases_added += 1
+                    
+                    if success:
+                        print(f"✓ Added {text_type} text release")
+                        releases_added += 1
+                    else:
+                        print(f"⚠ {text_type} release already existed")
+                        
                 except Exception as e:
                     print(f"✗ Error adding {text_type} release: {e}")
             else:

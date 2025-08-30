@@ -3,7 +3,7 @@ import sqlite3
 from pathlib import Path
 import pandas as pd
 
-# --- Путь к БД ---
+# --- Путь к БД ---2
 home_dir = Path.home()
 DB_PATH = home_dir / 'Documents' / 'economic_indicators.db'
 

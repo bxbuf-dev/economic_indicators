@@ -43,6 +43,28 @@ class IndicatorDAO:
         except sqlite3.Error as e:
             print(f"Ошибка при добавлении значения в БД: {e}")
 
+    def add_indicator_release(self, indicator_id, date, release_data, source_url, category=None):
+        """
+        Add indicator release with duplicate protection
+        """
+        created_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        release_data_json = json.dumps(release_data, indent=4)
+        
+        sql = "INSERT OR IGNORE INTO indicator_releases (indicator_id, date, category, release_data, source_url, created_at) VALUES (?, ?, ?, ?, ?, ?)"
+        
+        try:
+            self.cursor.execute(sql, (indicator_id, date, category, release_data_json, source_url, created_time))
+            
+            if self.cursor.rowcount > 0:
+                self.conn.commit()
+                return True
+            else:
+                return False
+                
+        except sqlite3.Error as e:
+            print(f"Error inserting release: {e}")
+            raise
+
     def get_latest_indicator_date(self, indicator_id: int) -> str | None:
         query = "SELECT MAX(date) FROM indicator_values WHERE indicator_id = ?"
         self.cursor.execute(query, (indicator_id,))
@@ -68,24 +90,6 @@ class IndicatorDAO:
         
         return df
 
-    def close(self):
-        if self.conn:
-            self.conn.close()
-    
-    # --- остальные get/add методы ---
-    def add_indicator_release(self, indicator_id, date, release_data, source_url, category=None):
-        created_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        release_data_json = json.dumps(release_data, indent=4)
-        sql = "INSERT INTO indicator_releases (indicator_id, date, category, release_data, source_url, created_at) VALUES (?, ?, ?, ?, ?, ?)"
-        try:
-            self.cursor.execute(sql, (indicator_id, date, category, release_data_json, source_url, created_time))
-            self.conn.commit()
-            print(f"✓ Successfully inserted release: indicator_id={indicator_id}, date={date}, category={category}")
-        except sqlite3.Error as e:
-            print(f"✗ Error inserting release: {e}")
-            print(f"  Parameters: indicator_id={indicator_id}, date={date}, category={category}")
-            raise
-
     def add_comment(self, indicator_id, date, comment_text):
         created_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         sql = "INSERT INTO comments (indicator_id, date, comment_text, created_at) VALUES (?, ?, ?, ?)"
@@ -97,3 +101,7 @@ class IndicatorDAO:
         df = pd.read_sql_query(sql, self.conn, params=(indicator_id,))
         df['date'] = pd.to_datetime(df['date'])
         return df
+
+    def close(self):
+        if self.conn:
+            self.conn.close()
