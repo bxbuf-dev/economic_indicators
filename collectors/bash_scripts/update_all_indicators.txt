@@ -1,0 +1,11 @@
+# Полное обновление всех индикаторов
+./update_all_indicators.sh
+
+# Быстрое обновление только ключевых
+./update_all_indicators.sh --quick
+
+# Проверка состояния БД без обновления
+./update_all_indicators.sh --status
+
+# Список доступных коллекторов
+./update_all_indicators.sh --list
