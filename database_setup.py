@@ -1,10 +1,15 @@
 # database_setup.py
 import sqlite3
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
-# --- Определение пути к файлу Базы Данных ---
+# --- Загрузка переменных окружения ---
+load_dotenv()
 home_dir = Path.home()
-DB_PATH = home_dir / 'Documents' / 'economic_indicators.db'
+DB_SUBDIR = os.getenv("DB_SUBDIR", "Documents")
+DB_FILE = os.getenv("DB_FILE", "economic_indicators.db")
+DB_PATH = home_dir / DB_SUBDIR / DB_FILE
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 def setup_database():
@@ -14,7 +19,7 @@ def setup_database():
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        print("Подключено к базе данных SQLite.")
+        print(f"Подключено к базе данных SQLite: {DB_PATH}")
 
         # --- Удаление старых таблиц для чистой установки ---
         cursor.execute("DROP TABLE IF EXISTS comments;")

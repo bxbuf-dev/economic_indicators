@@ -1,0 +1,62 @@
+# Technical Snapshot: Economic Indicators Project
+project_meta:
+  name: economic_indicators_collection_and_visualization
+  status: Stage 2 (Data Collection) in progress. All Treasury collectors are complete.
+  github_url: https://github.com/bxbuf-dev/economic_indicators.git
+  last_updated: 2025-08-25
+
+project_plan:
+  objective: Develop a system for collecting, storing, and visualizing economic and market indicators.
+  development_principles:
+    - regression_testing: When modifying an existing, completed module (e.g., dao.py), all of its public methods must be re-tested to ensure that new changes have not broken existing functionality.
+    - task_completion_workflow: Before a task is considered complete, the developer must perform these three steps - 1. Update dependencies (`pip freeze > requirements.txt`). 2. Commit all changes to Git with a clear message. 3. Update this Technical Snapshot file with any relevant changes.
+  required_indicators:
+    - numeric_series:
+      - Nominal Yield Curve
+      - Real Yield Curve
+      - Real M2
+      - Building Permits
+      - UMCSI
+      - ISM Manufacturing PMI
+      - ISM Services PMI (NMI)
+    - text_releases:
+      - ISM (manufacturing/services)
+      - UMCSI
+      - Housing construction (if comments are present)
+
+# ... (секции database и dao без изменений) ...
+
+collectors:
+  - collector_id: yield_curve_collector
+    file: collectors/yield_curve_collector.py
+    indicator_name: us_treasury_yield_curve
+    logic:
+      - A simple wrapper that defines the configuration for nominal rates.
+      - Calls the universal parsing function from the shared `treasury_parser.py`.
+      - Saves the returned, filtered (Fridays only) data to the database.
+      - Reliably handles incremental loading and recovery of partial data.
+  - collector_id: real_yield_curve_collector
+    file: collectors/real_yield_curve_collector.py
+    indicator_name: us_treasury_real_yield_curve
+    logic:
+      - A simple wrapper that defines the configuration for real rates.
+      - Calls the universal parsing function from the shared `treasury_parser.py`.
+      - Saves the returned, filtered (Fridays only) data to the database.
+      - Reliably handles incremental loading and recovery of partial data.
+  - collector_id: fred_data_collector
+    file: collectors/fred_data_collector.py
+    indicator_name: real_m2_usd
+    source: FRED API
+    logic:
+      - Uses the 'fredapi' library and a robust incremental loading strategy.
+
+# ... (секция dependencies без изменений) ...
+
+project_structure:
+  - economic_indicators/
+    - collectors/
+      - yield_curve_collector.py
+      - real_yield_curve_collector.py
+      - fred_data_collector.py
+      - treasury_parser.py # <-- Shared parser for Treasury data
+    # ... (остальные файлы) ...

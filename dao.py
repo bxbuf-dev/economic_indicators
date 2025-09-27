@@ -4,10 +4,15 @@ import json
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
-# --- Определение пути к файлу Базы Данных ---
+# --- Загрузка переменных окружения ---
+load_dotenv()
 home_dir = Path.home()
-DB_PATH = home_dir / 'Documents' / 'economic_indicators.db'
+DB_SUBDIR = os.getenv("DB_SUBDIR", "Documents")
+DB_FILE = os.getenv("DB_FILE", "economic_indicators.db")
+DB_PATH = home_dir / DB_SUBDIR / DB_FILE
 
 class IndicatorDAO:
     def __init__(self):
@@ -49,18 +54,16 @@ class IndicatorDAO:
         """
         created_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         release_data_json = json.dumps(release_data, indent=4)
-        
+
         sql = "INSERT OR IGNORE INTO indicator_releases (indicator_id, date, category, release_data, source_url, created_at) VALUES (?, ?, ?, ?, ?, ?)"
-        
+
         try:
             self.cursor.execute(sql, (indicator_id, date, category, release_data_json, source_url, created_time))
-            
             if self.cursor.rowcount > 0:
                 self.conn.commit()
                 return True
             else:
                 return False
-                
         except sqlite3.Error as e:
             print(f"Error inserting release: {e}")
             raise
@@ -82,12 +85,12 @@ class IndicatorDAO:
         WHERE indicator_id = ? AND category = ?
         ORDER BY date DESC
         """
-        
+
         df = pd.read_sql_query(query, self.conn, params=(indicator_id, category))
         if not df.empty:
             df['date'] = pd.to_datetime(df['date'])
             df.set_index('date', inplace=True)
-        
+
         return df
 
     def add_comment(self, indicator_id, date, comment_text):
