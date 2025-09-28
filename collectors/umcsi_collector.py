@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from dao_No_Debug import IndicatorDAO
+from dao import IndicatorDAO
 from collectors.umcsi_parser import get_umcsi_data
 import json
 
